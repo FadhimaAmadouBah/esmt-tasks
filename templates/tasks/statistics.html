@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Statistiques{% endblock %}
+{% block content %}
+{% include 'partials/navbar.html' %}
+<div class="app-layout">
+    {% include 'partials/sidebar.html' %}
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <p class="page-subtitle">Analyse</p>
+                <h1 class="page-title">Statistiques & Primes</h1>
+            </div>
+        </div>
+        <div class="card" style="margin-bottom:1.5rem;">
+            <div class="card-header"><span class="card-title"><i class="bi bi-calendar3"></i> Mes statistiques {{ year }}</span></div>
+            <div class="card-body">
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;">
+                    {% for q in quarterly_stats %}
+                    <div style="text-align:center;padding:1.25rem;border-radius:var(--radius);border:1.5px solid var(--beige-dark);">
+                        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--brown-pale);margin-bottom:.5rem;">{{ q.quarter }}</div>
+                        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--brown-dark);">{{ q.rate }}%</div>
+                        <div style="font-size:.78rem;color:var(--brown-pale);margin:.3rem 0;">{{ q.on_time }}/{{ q.total }} dans les délais</div>
+                        {% if q.rate == 100 %}
+                        <span style="background:#d8eddf;color:#2f6b45;padding:.2rem .6rem;border-radius:20px;font-size:.72rem;font-weight:600;">🏆 100 000 FCFA</span>
+                        {% elif q.rate >= 90 %}
+                        <span style="background:#f5ecd8;color:#7a5010;padding:.2rem .6rem;border-radius:20px;font-size:.72rem;font-weight:600;">⭐ 30 000 FCFA</span>
+                        {% else %}
+                        <span style="background:var(--beige);color:var(--brown-pale);padding:.2rem .6rem;border-radius:20px;font-size:.72rem;">Pas de prime</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% if evaluations %}
+        <div class="card">
+            <div class="card-header"><span class="card-title"><i class="bi bi-award"></i> Évaluations Professeurs — {{ year }}</span></div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Professeur</th><th>Tâches</th><th>Dans les délais</th><th>Taux</th><th>Prime</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for eval in evaluations %}
+                        <tr>
+                            <td><strong>{{ eval.user.get_full_name|default:eval.user.username }}</strong></td>
+                            <td>{{ eval.total }}</td>
+                            <td>{{ eval.on_time }}</td>
+                            <td>{{ eval.rate }}%</td>
+                            <td>
+                                {% if eval.prime == 100000 %}<span style="background:#d8eddf;color:#2f6b45;padding:.3rem .75rem;border-radius:20px;font-size:.8rem;font-weight:700;">🏆 100 000 FCFA</span>
+                                {% elif eval.prime == 30000 %}<span style="background:#f5ecd8;color:#7a5010;padding:.3rem .75rem;border-radius:20px;font-size:.8rem;font-weight:700;">⭐ 30 000 FCFA</span>
+                                {% else %}<span style="background:var(--beige);color:var(--brown-pale);padding:.3rem .75rem;border-radius:20px;">—</span>{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

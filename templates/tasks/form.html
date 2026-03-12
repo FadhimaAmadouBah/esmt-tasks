@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} une tâche{% endblock %}
+{% block content %}
+{% include 'partials/navbar.html' %}
+<div class="app-layout">
+    {% include 'partials/sidebar.html' %}
+    <main class="main-content">
+        <div style="max-width:600px;">
+            <div class="page-header">
+                <div>
+                    <p class="page-subtitle">Formulaire</p>
+                    <h1 class="page-title">{{ action }} une tâche</h1>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="form-group">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}<div class="errorlist">{{ field.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        {% endfor %}
+                        <div style="display:flex;gap:.75rem;margin-top:1.5rem;">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> {{ action }}</button>
+                            <a href="{% url 'project_detail' project.pk %}" class="btn btn-outline">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

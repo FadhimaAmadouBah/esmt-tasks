@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Supprimer{% endblock %}
+{% block content %}
+{% include 'partials/navbar.html' %}
+<div class="app-layout">
+    {% include 'partials/sidebar.html' %}
+    <main class="main-content">
+        <div style="max-width:480px;margin:3rem auto;">
+            <div class="card" style="border-top:3px solid var(--red);">
+                <div class="card-body" style="text-align:center;padding:2.5rem;">
+                    <i class="bi bi-exclamation-triangle" style="font-size:3rem;color:var(--red);opacity:.7;display:block;margin-bottom:1rem;"></i>
+                    <h3 style="font-family:'Cormorant Garamond',serif;color:var(--brown-dark);margin-bottom:.75rem;">Supprimer ce projet ?</h3>
+                    <p style="color:var(--brown-pale);margin-bottom:.5rem;">Vous allez supprimer <strong>{{ project.name }}</strong></p>
+                    <p style="color:var(--red);font-size:.85rem;margin-bottom:2rem;">⚠️ Toutes les tâches associées seront supprimées !</p>
+                    <form method="post" style="display:flex;gap:.75rem;justify-content:center;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Oui, supprimer</button>
+                        <a href="{% url 'project_detail' project.pk %}" class="btn btn-outline">Annuler</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
