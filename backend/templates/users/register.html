@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Inscription{% endblock %}
+{% block content %}
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-card-header">
+            <div class="auth-logo">E</div>
+            <h2>Créer un compte</h2>
+            <p>Rejoignez la plateforme ESMT</p>
+        </div>
+        <div class="auth-card-body">
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <div class="errorlist">{{ field.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:.75rem;margin-top:.5rem;">
+                    <i class="bi bi-check-circle"></i> Créer mon compte
+                </button>
+            </form>
+            <p style="text-align:center;margin-top:1.5rem;font-size:.875rem;color:var(--brown-pale);">
+                Déjà un compte ? <a href="{% url 'login' %}" class="auth-link">Se connecter</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

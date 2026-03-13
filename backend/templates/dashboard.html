@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <p class="page-subtitle">Bienvenue de retour</p>
+        <h1 class="page-title">{{ user.first_name|default:user.username }} 👋</h1>
+    </div>
+    <a href="{% url 'project_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Nouveau projet
+    </a>
+</div>
+
+<!-- Statistiques -->
+<div class="stat-grid">
+    <div class="stat-card c1">
+        <div class="stat-icon c1"><i class="bi bi-list-check"></i></div>
+        <div class="stat-value">{{ total_tasks }}</div>
+        <div class="stat-label">Tâches totales</div>
+    </div>
+    <div class="stat-card c2">
+        <div class="stat-icon c2"><i class="bi bi-check-circle"></i></div>
+        <div class="stat-value">{{ done_tasks }}</div>
+        <div class="stat-label">Terminées</div>
+    </div>
+    <div class="stat-card c3">
+        <div class="stat-icon c3"><i class="bi bi-arrow-repeat"></i></div>
+        <div class="stat-value">{{ in_progress }}</div>
+        <div class="stat-label">En cours</div>
+    </div>
+    <div class="stat-card c4">
+        <div class="stat-icon c4"><i class="bi bi-graph-up"></i></div>
+        <div class="stat-value">{{ completion_rate }}%</div>
+        <div class="stat-label">Taux de complétion</div>
+    </div>
+</div>
+
+{% if overdue_count > 0 %}
+<div class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <strong>{{ overdue_count }} tâche(s) en retard !</strong> Pensez à les traiter rapidement.
+</div>
+{% endif %}
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+
+    <!-- Mes Projets -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title"><i class="bi bi-folder2-open"></i> Mes Projets</span>
+            <a href="{% url 'project_list' %}" class="btn btn-outline btn-sm">Voir tout</a>
+        </div>
+        <div class="card-body" style="padding:0;">
+            {% if created_projects %}
+                {% for project in created_projects %}
+                <div style="padding:.9rem 1.4rem; border-bottom:1px solid var(--beige); display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <a href="{% url 'project_detail' project.pk %}" class="project-name" style="font-size:.9rem;">{{ project.name }}</a>
+                        <div style="font-size:.77rem; color:var(--brown-pale); margin-top:.1rem;">{{ project.tasks.count }} tâche(s)</div>
+                    </div>
+                    <span style="font-size:.82rem; font-weight:700; color:var(--brown-dark);">{{ project.get_completion_rate }}%</span>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state" style="padding:2.5rem;">
+                <i class="bi bi-folder-plus"></i>
+                <h4>Aucun projet</h4>
+                <p>Créez votre premier projet</p>
+                <a href="{% url 'project_create' %}" class="btn btn-primary btn-sm">Commencer</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Mes Tâches -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title"><i class="bi bi-clipboard-check"></i> Mes Tâches</span>
+        </div>
+        <div class="card-body" style="padding:0;">
+            {% if my_tasks %}
+                {% for task in my_tasks %}
+                <div style="padding:.9rem 1.4rem; border-bottom:1px solid var(--beige);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem;">
+                        <span class="task-title" style="font-size:.88rem;">{{ task.title }}</span>
+                        <span class="badge badge-{{ task.status }}">{{ task.get_status_display }}</span>
+                    </div>
+                    <div class="task-meta">
+                        <span><i class="bi bi-folder2"></i> {{ task.project.name }}</span>
+                        {% if task.due_date %}<span><i class="bi bi-calendar3"></i> {{ task.due_date|date:"d/m/Y" }}</span>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state" style="padding:2.5rem;">
+                <i class="bi bi-clipboard"></i>
+                <h4>Aucune tâche</h4>
+                <p>Aucune tâche assignée pour l'instant</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block title %}{{ project.name }}{% endblock %}
+{% block content %}
+
+{% include 'partials/navbar.html' %}
+
+<div class="app-layout">
+    {% include 'partials/sidebar.html' %}
+    <main class="main-content">
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }}">
+                <i class="bi bi-info-circle"></i> {{ message }}
+                <button class="alert-close" onclick="this.parentElement.remove()">✕</button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="breadcrumb">
+            <a href="{% url 'project_list' %}">Projets</a>
+            <span>›</span>
+            <span>{{ project.name }}</span>
+        </div>
+
+        <div class="page-header">
+            <div>
+                <p class="page-subtitle">Projet</p>
+                <h1 class="page-title">{{ project.name }}</h1>
+                {% if project.description %}
+                <p style="color:var(--brown-pale);margin-top:.3rem;">{{ project.description }}</p>
+                {% endif %}
+            </div>
+            {% if is_creator %}
+            <div style="display:flex;gap:.5rem;">
+                <a href="{% url 'task_create' project.pk %}" class="btn btn-primary">
+                    <i class="bi bi-plus"></i> Ajouter tâche
+                </a>
+                <a href="{% url 'project_edit' project.pk %}" class="btn btn-outline">
+                    <i class="bi bi-pencil"></i>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Filtres -->
+        <div class="filter-bar">
+            <span class="filter-label">Filtrer :</span>
+            <form method="get" style="display:flex;gap:.75rem;align-items:center;">
+                <select name="status" class="filter-select" onchange="this.form.submit()">
+                    <option value="">Tous les statuts</option>
+                    <option value="a_faire" {% if status_filter == 'a_faire' %}selected{% endif %}>À faire</option>
+                    <option value="en_cours" {% if status_filter == 'en_cours' %}selected{% endif %}>En cours</option>
+                    <option value="termine" {% if status_filter == 'termine' %}selected{% endif %}>Terminé</option>
+                </select>
+                <select name="user" class="filter-select" onchange="this.form.submit()">
+                    <option value="">Tous les membres</option>
+                    {% for member in members %}
+                    <option value="{{ member.id }}" {% if user_filter == member.id|stringformat:"s" %}selected{% endif %}>
+                        {{ member.username }}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if status_filter or user_filter %}
+                <a href="{% url 'project_detail' project.pk %}" class="btn btn-outline btn-sm">✕ Effacer</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Tâches -->
+        {% if tasks %}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;">
+            {% for task in tasks %}
+            <div class="task-card {% if task.is_overdue %}overdue{% endif %}">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;">
+                    <span class="task-title">{{ task.title }}</span>
+                    <span class="badge badge-{{ task.status }}">{{ task.get_status_display }}</span>
+                </div>
+                {% if task.description %}
+                <p style="font-size:.82rem;color:var(--brown-pale);margin:.3rem 0;line-height:1.4;">{{ task.description|truncatewords:10 }}</p>
+                {% endif %}
+                <div class="task-meta">
+                    {% if task.assigned_to %}
+                    <span><i class="bi bi-person"></i> {{ task.assigned_to.username }}</span>
+                    {% endif %}
+                    {% if task.due_date %}
+                    <span class="{% if task.is_overdue %}text-danger{% endif %}">
+                        <i class="bi bi-calendar3"></i> {{ task.due_date|date:"d/m/Y" }}
+                        {% if task.is_overdue %} ⚠️{% endif %}
+                    </span>
+                    {% endif %}
+                </div>
+                {% if is_creator or task.assigned_to == request.user %}
+                <div style="display:flex;gap:.5rem;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--beige);">
+                    <a href="{% url 'task_update' task.pk %}" class="btn btn-outline btn-sm">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </a>
+                    {% if is_creator %}
+                    <a href="{% url 'task_delete' task.pk %}" class="btn btn-danger btn-sm"
+                       onclick="return confirm('Supprimer cette tâche ?')">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-clipboard"></i>
+            <h4>Aucune tâche</h4>
+            <p>Ce projet n'a pas encore de tâches</p>
+            {% if is_creator %}
+            <a href="{% url 'task_create' project.pk %}" class="btn btn-primary">
+                <i class="bi bi-plus"></i> Créer une tâche
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </main>
+</div>
+
+{% endblock %}

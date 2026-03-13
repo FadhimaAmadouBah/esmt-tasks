@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}Projets{% endblock %}
+{% block content %}
+
+{% include 'partials/navbar.html' %}
+
+<div class="app-layout">
+    {% include 'partials/sidebar.html' %}
+    <main class="main-content">
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }}">
+                <i class="bi bi-info-circle"></i> {{ message }}
+                <button class="alert-close" onclick="this.parentElement.remove()">✕</button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="page-header">
+            <div>
+                <p class="page-subtitle">Gestion</p>
+                <h1 class="page-title">Mes Projets</h1>
+            </div>
+            <a href="{% url 'project_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Nouveau projet
+            </a>
+        </div>
+
+        {% if my_projects %}
+        <p style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--brown-pale);margin-bottom:1rem;">
+            Projets créés par moi
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;margin-bottom:2rem;">
+            {% for project in my_projects %}
+            <div class="project-card">
+                <div style="padding:1.25rem 1.25rem .75rem;">
+                    <a href="{% url 'project_detail' project.pk %}" class="project-name">{{ project.name }}</a>
+                    <p style="font-size:.82rem;color:var(--brown-pale);line-height:1.5;">{{ project.description|truncatewords:12 }}</p>
+                </div>
+                <div class="progress-wrap">
+                    <div class="progress-fill {% if project.get_completion_rate >= 80 %}high{% endif %}" style="width:{{ project.get_completion_rate }}%"></div>
+                </div>
+                <div style="display:flex;gap:1rem;padding:.7rem 1.25rem;border-top:1px solid var(--beige);font-size:.79rem;color:var(--gray-600);">
+                    <span><i class="bi bi-people"></i> {{ project.members.count }} membre(s)</span>
+                    <span><i class="bi bi-list-check"></i> {{ project.tasks.count }} tâche(s)</span>
+                    <span style="margin-left:auto;font-weight:700;color:var(--brown-dark);">{{ project.get_completion_rate }}%</span>
+                </div>
+                <div style="padding:.75rem 1.25rem;border-top:1px solid var(--beige);display:flex;gap:.5rem;background:var(--beige-light);">
+                    <a href="{% url 'project_detail' project.pk %}" class="btn btn-primary btn-sm">Voir</a>
+                    <a href="{% url 'project_edit' project.pk %}" class="btn btn-outline btn-sm">Modifier</a>
+                    <a href="{% url 'project_delete' project.pk %}" class="btn btn-danger btn-sm">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if member_projects %}
+        <p style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--brown-pale);margin-bottom:1rem;">
+            Projets auxquels je participe
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;">
+            {% for project in member_projects %}
+            <div class="project-card" style="border-color:var(--blue);border-top:3px solid var(--blue);">
+                <div style="padding:1.25rem;">
+                    <a href="{% url 'project_detail' project.pk %}" class="project-name">{{ project.name }}</a>
+                    <p style="font-size:.8rem;color:var(--brown-pale);margin-top:.25rem;">
+                        <i class="bi bi-person"></i> {{ project.created_by.username }}
+                    </p>
+                </div>
+                <div style="padding:.75rem 1.25rem;border-top:1px solid var(--beige);background:var(--beige-light);">
+                    <a href="{% url 'project_detail' project.pk %}" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;">Voir le projet</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if not my_projects and not member_projects %}
+        <div class="empty-state">
+            <i class="bi bi-folder-plus"></i>
+            <h4>Aucun projet pour le moment</h4>
+            <p>Créez votre premier projet pour commencer</p>
+            <a href="{% url 'project_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus"></i> Créer un projet
+            </a>
+        </div>
+        {% endif %}
+
+    </main>
+</div>
+
+{% endblock %}

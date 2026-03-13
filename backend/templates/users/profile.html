@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Mon Profil{% endblock %}
+{% block content %}
+
+{% include 'partials/navbar.html' %}
+
+<div class="app-layout">
+    {% include 'partials/sidebar.html' %}
+    <main class="main-content">
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }}">
+                <i class="bi bi-info-circle"></i> {{ message }}
+                <button class="alert-close" onclick="this.parentElement.remove()">✕</button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="page-header">
+            <div>
+                <p class="page-subtitle">Paramètres</p>
+                <h1 class="page-title">Mon Profil</h1>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:300px 1fr; gap:1.5rem;">
+
+            <!-- Carte profil gauche -->
+            <div class="card" style="align-self:start;">
+                <div class="card-body" style="text-align:center; padding:2rem;">
+                    {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--beige-dark);">
+                    {% else %}
+                    <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--beige-dark),var(--brown-pale));display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:700;color:var(--brown-dark);margin:0 auto;">
+                        {{ user.username.0|upper }}
+                    </div>
+                    {% endif %}
+                    <h4 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--brown-dark);margin-top:1rem;">
+                        {{ user.get_full_name|default:user.username }}
+                    </h4>
+                    <span class="role-badge {{ user.role }}" style="margin-top:.3rem;display:inline-block;">
+                        {{ user.get_role_display }}
+                    </span>
+                    <p style="font-size:.85rem;color:var(--brown-pale);margin-top:.5rem;">{{ user.email }}</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--beige);">
+                        <div>
+                            <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:var(--brown-dark);">{{ user.created_projects.count }}</div>
+                            <div style="font-size:.75rem;color:var(--brown-pale);">Projets</div>
+                        </div>
+                        <div>
+                            <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:var(--brown-dark);">{{ user.assigned_tasks.count }}</div>
+                            <div style="font-size:.75rem;color:var(--brown-pale);">Tâches</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulaire droite -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="bi bi-pencil-square"></i> Modifier mes informations</span>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="form-group">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <div class="errorlist">{{ field.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Sauvegarder
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+{% endblock %}

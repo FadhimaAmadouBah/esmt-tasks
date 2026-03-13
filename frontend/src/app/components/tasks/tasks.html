@@ -1,0 +1,123 @@
+<div class="layout">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="logo">E</div>
+      <span class="brand">ESMT <span>Tasks</span></span>
+    </div>
+    <div class="navbar-right">
+      <div class="user-chip" *ngIf="user">
+        <div class="avatar">{{ user.username[0].toUpperCase() }}</div>
+        <span>{{ user.username }}</span>
+        <span class="badge" [class]="user.role">{{ user.role }}</span>
+      </div>
+      <button class="logout-btn" (click)="logout()">⇥</button>
+    </div>
+  </nav>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">Navigation</div>
+      <a routerLink="/dashboard" class="sidebar-link">⊞ Tableau de bord</a>
+      <a routerLink="/projects" class="sidebar-link active">📁 Projets</a>
+      <div class="sidebar-divider"></div>
+      <a class="sidebar-link" (click)="logout()">⇥ Déconnexion</a>
+    </aside>
+    <main class="main-content">
+      <div class="breadcrumb">
+        <a routerLink="/projects">Projets</a>
+        <span>›</span>
+        <span>{{ project?.name }}</span>
+      </div>
+      <div class="page-header">
+        <div>
+          <p class="page-subtitle">Projet</p>
+          <h1 class="page-title">{{ project?.name }}</h1>
+        </div>
+        <button class="btn-primary" (click)="openForm()" *ngIf="isCreator()">+ Ajouter tâche</button>
+      </div>
+      <div class="filter-bar">
+        <span class="filter-label">Filtrer :</span>
+        <select class="filter-select" [(ngModel)]="statusFilter" (change)="applyFilters()">
+          <option value="">Tous les statuts</option>
+          <option value="a_faire">À faire</option>
+          <option value="en_cours">En cours</option>
+          <option value="termine">Terminé</option>
+        </select>
+        <select class="filter-select" [(ngModel)]="userFilter" (change)="applyFilters()">
+          <option value="">Tous les membres</option>
+          <option *ngFor="let u of users" [value]="u.id">{{ u.username }}</option>
+        </select>
+        <button class="btn-outline btn-sm" *ngIf="statusFilter || userFilter" (click)="statusFilter=''; userFilter=''; applyFilters()">✕</button>
+      </div>
+      <div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
+        <div class="modal" (click)="$event.stopPropagation()">
+          <h3>{{ editingTask ? 'Modifier' : 'Créer' }} une tâche</h3>
+          <div class="alert-error" *ngIf="error">{{ error }}</div>
+          <form (ngSubmit)="onSubmit()">
+            <div class="form-group">
+              <label>Titre</label>
+              <input type="text" [(ngModel)]="form.title" name="title" required>
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea [(ngModel)]="form.description" name="description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Assigné à</label>
+              <select [(ngModel)]="form.assigned_to" name="assigned_to">
+                <option [ngValue]="null">-- Personne --</option>
+                <option *ngFor="let u of users" [value]="u.id">{{ u.username }} ({{ u.role }})</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Statut</label>
+              <select [(ngModel)]="form.status" name="status">
+                <option value="a_faire">À faire</option>
+                <option value="en_cours">En cours</option>
+                <option value="termine">Terminé</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Priorité</label>
+              <select [(ngModel)]="form.priority" name="priority">
+                <option value="basse">Basse</option>
+                <option value="normale">Normale</option>
+                <option value="haute">Haute</option>
+                <option value="urgente">Urgente</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Date limite</label>
+              <input type="datetime-local" [(ngModel)]="form.due_date" name="due_date">
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">{{ editingTask ? 'Modifier' : 'Créer' }}</button>
+              <button type="button" class="btn-outline" (click)="closeForm()">Annuler</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="tasks-grid">
+        <div *ngFor="let task of filteredTasks" class="task-card" [class.overdue]="task.is_overdue">
+          <div class="task-header">
+            <span class="task-title">{{ task.title }}</span>
+            <span class="badge-status" [class]="task.status">{{ getStatusLabel(task.status) }}</span>
+          </div>
+          <p class="task-desc" *ngIf="task.description">{{ task.description }}</p>
+          <div class="task-meta">
+            <span *ngIf="task.assigned_to">👤 {{ getUserName(task.assigned_to) }}</span>
+            <span *ngIf="task.due_date">📅 {{ task.due_date | date:'dd/MM/yyyy' }}</span>
+            <span class="priority" [class]="task.priority">{{ task.priority }}</span>
+          </div>
+          <div class="task-actions" *ngIf="canEdit(task)">
+            <button class="btn-outline btn-sm" (click)="openForm(task)">✏️ Modifier</button>
+            <button class="btn-danger btn-sm" (click)="deleteTask(task.id)" *ngIf="isCreator()">🗑</button>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="filteredTasks.length === 0" class="empty-state">
+        <p>Aucune tâche pour le moment</p>
+        <button class="btn-primary" (click)="openForm()" *ngIf="isCreator()">Créer une tâche</button>
+      </div>
+    </main>
+  </div>
+</div>

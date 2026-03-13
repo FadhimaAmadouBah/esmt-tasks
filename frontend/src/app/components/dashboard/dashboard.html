@@ -1,0 +1,73 @@
+<div class="layout">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="logo">E</div>
+      <span class="brand">ESMT <span>Tasks</span></span>
+    </div>
+    <div class="navbar-right">
+      <div class="user-chip" *ngIf="user">
+        <div class="avatar">{{ user.username[0].toUpperCase() }}</div>
+        <span>{{ user.username }}</span>
+        <span class="badge" [class]="user.role">{{ user.role }}</span>
+      </div>
+      <button class="logout-btn" (click)="logout()">⇥</button>
+    </div>
+  </nav>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">Navigation</div>
+      <a routerLink="/dashboard" class="sidebar-link active"><span>⊞</span> Tableau de bord</a>
+      <a routerLink="/projects" class="sidebar-link"><span>📁</span> Projets</a>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">Compte</div>
+      <a class="sidebar-link" (click)="logout()"><span>⇥</span> Déconnexion</a>
+    </aside>
+    <main class="main-content">
+      <div class="page-header">
+        <div>
+          <p class="page-subtitle">Bonjour 👋</p>
+          <h1 class="page-title">{{ user?.first_name || user?.username }}</h1>
+        </div>
+        <a routerLink="/projects" class="btn-primary">+ Nouveau projet</a>
+      </div>
+      <div class="stat-grid" *ngIf="stats">
+        <div class="stat-card c1">
+          <div class="stat-icon">📁</div>
+          <div class="stat-value">{{ projects.length }}</div>
+          <div class="stat-label">Projets</div>
+        </div>
+        <div class="stat-card c2">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value">{{ stats.done_tasks }}</div>
+          <div class="stat-label">Tâches terminées</div>
+        </div>
+        <div class="stat-card c3">
+          <div class="stat-icon">📋</div>
+          <div class="stat-value">{{ stats.total_tasks }}</div>
+          <div class="stat-label">Total tâches</div>
+        </div>
+        <div class="stat-card c4">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-value">{{ stats.completion_rate }}%</div>
+          <div class="stat-label">Taux complétion</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📁 Mes projets récents</span>
+          <a routerLink="/projects" class="btn-outline">Voir tout</a>
+        </div>
+        <div class="card-body">
+          <div *ngFor="let project of projects | slice:0:4" class="project-row" (click)="goToProject(project.id)">
+            <span class="project-name">{{ project.name }}</span>
+            <span class="project-rate">{{ project.completion_rate }}%</span>
+          </div>
+          <div *ngIf="projects.length === 0" class="empty-state">
+            <p>Aucun projet pour le moment</p>
+            <a routerLink="/projects" class="btn-primary">Créer un projet</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

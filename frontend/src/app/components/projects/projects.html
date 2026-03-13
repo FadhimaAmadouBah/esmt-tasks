@@ -1,0 +1,91 @@
+<div class="layout">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="logo">E</div>
+      <span class="brand">ESMT <span>Tasks</span></span>
+    </div>
+    <div class="navbar-right">
+      <div class="user-chip" *ngIf="user">
+        <div class="avatar">{{ user.username[0].toUpperCase() }}</div>
+        <span>{{ user.username }}</span>
+        <span class="badge" [class]="user.role">{{ user.role }}</span>
+      </div>
+      <button class="logout-btn" (click)="logout()">⇥</button>
+    </div>
+  </nav>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">Navigation</div>
+      <a routerLink="/dashboard" class="sidebar-link"><span>⊞</span> Tableau de bord</a>
+      <a routerLink="/projects" class="sidebar-link active"><span>📁</span> Projets</a>
+      <div class="sidebar-divider"></div>
+      <a class="sidebar-link" (click)="logout()"><span>⇥</span> Déconnexion</a>
+    </aside>
+    <main class="main-content">
+      <div class="page-header">
+        <div>
+          <p class="page-subtitle">Gestion</p>
+          <h1 class="page-title">Mes Projets</h1>
+        </div>
+        <button class="btn-primary" (click)="openForm()">+ Nouveau projet</button>
+      </div>
+
+      <div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
+        <div class="modal" (click)="$event.stopPropagation()">
+          <h3>{{ editingProject ? 'Modifier' : 'Créer' }} un projet</h3>
+          <div class="alert-error" *ngIf="error">{{ error }}</div>
+          <form (ngSubmit)="onSubmit()">
+            <div class="form-group">
+              <label>Nom du projet</label>
+              <input type="text" [(ngModel)]="form.name" name="name" required>
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea [(ngModel)]="form.description" name="description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Membres</label>
+              <div class="members-list">
+                <div *ngFor="let u of users" class="member-item" (click)="toggleMember(u.id)" [class.selected]="isMemberSelected(u.id)">
+                  <div class="member-avatar">{{ u.username[0].toUpperCase() }}</div>
+                  <span>{{ u.username }}</span>
+                  <span class="badge" [class]="u.role">{{ u.role }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">{{ editingProject ? 'Modifier' : 'Créer' }}</button>
+              <button type="button" class="btn-outline" (click)="closeForm()">Annuler</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="projects-grid">
+        <div *ngFor="let project of projects" class="project-card">
+          <div class="project-card-body" (click)="goToTasks(project.id)">
+            <h3 class="project-name">{{ project.name }}</h3>
+            <p class="project-desc">{{ project.description }}</p>
+            <div class="progress-wrap">
+              <div class="progress-fill" [style.width]="project.completion_rate + '%'"></div>
+            </div>
+            <div class="project-meta">
+              <span>👥 {{ project.members.length }} membre(s)</span>
+              <span class="project-rate">{{ project.completion_rate }}%</span>
+            </div>
+          </div>
+          <div class="project-card-footer" *ngIf="isCreator(project)">
+            <button class="btn-primary btn-sm" (click)="goToTasks(project.id)">Voir</button>
+            <button class="btn-outline btn-sm" (click)="openForm(project); $event.stopPropagation()">Modifier</button>
+            <button class="btn-danger btn-sm" (click)="deleteProject(project.id); $event.stopPropagation()">🗑</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="projects.length === 0" class="empty-state">
+        <p>Aucun projet pour le moment</p>
+        <button class="btn-primary" (click)="openForm()">Créer un projet</button>
+      </div>
+    </main>
+  </div>
+</div>
