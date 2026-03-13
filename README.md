@@ -15,7 +15,8 @@ et de primes pour les professeurs.
 | Django REST Framework | API RESTful |
 | SQLite | Base de données |
 | JWT (SimpleJWT) | Authentification API |
-| HTML/CSS/JS | Frontend (templates Django) |
+| Angular 21 | Frontend (Objectif 2) |
+| HTML/CSS/JS | Frontend (Templates Django - Objectif 1) |
 
 ---
 
@@ -23,6 +24,7 @@ et de primes pour les professeurs.
 
 ### 1. Prérequis
 - Python 3.10+
+- Node.js 18+
 - pip
 - Git
 
@@ -32,44 +34,52 @@ git clone https://github.com/FadhimaAmadouBah/esmt-tasks.git
 cd esmt-tasks
 ```
 
-### 3. Créer l'environnement virtuel
+### 3. Backend Django
 ```bash
-# Windows
+# Créer l'environnement virtuel
 python -m venv venv
+
+# Windows
 venv\Scripts\activate
 
 # Mac/Linux
-python3 -m venv venv
 source venv/bin/activate
-```
 
-### 4. Installer les dépendances
-```bash
+# Installer les dépendances
 pip install django djangorestframework django-cors-headers djangorestframework-simplejwt Pillow
-```
 
-### 5. Appliquer les migrations
-```bash
+# Appliquer les migrations
 python manage.py makemigrations users
 python manage.py makemigrations projects
 python manage.py makemigrations tasks
 python manage.py migrate
-```
 
-### 6. Créer un superutilisateur
-```bash
+# Créer un superutilisateur
 python manage.py createsuperuser
-```
 
-### 7. Lancer le serveur
-```bash
+# Lancer le serveur
 python manage.py runserver
 ```
 
-### 8. Accéder à l'application
-- Interface web : http://127.0.0.1:8000
-- Administration : http://127.0.0.1:8000/admin
-- API : http://127.0.0.1:8000/api/
+### 4. Frontend Angular
+```bash
+cd frontend
+
+# Installer les dépendances
+npm install
+
+# Lancer Angular
+ng serve
+```
+
+### 5. Accéder à l'application
+
+| Interface | URL |
+|---|---|
+| Django Templates (Objectif 1) | http://127.0.0.1:8000 |
+| Angular (Objectif 2) | http://localhost:4200 |
+| Administration Django | http://127.0.0.1:8000/admin |
+| API REST | http://127.0.0.1:8000/api/ |
 
 ---
 
@@ -135,7 +145,7 @@ python manage.py runserver
 
 ## 🌐 Routes disponibles
 
-### Pages Web
+### Pages Django Templates (Objectif 1)
 
 | URL | Description |
 |---|---|
@@ -146,13 +156,18 @@ python manage.py runserver
 | `/projects/` | Liste des projets |
 | `/projects/create/` | Créer un projet |
 | `/projects/<id>/` | Détail d'un projet |
-| `/projects/<id>/edit/` | Modifier un projet |
-| `/projects/<id>/delete/` | Supprimer un projet |
-| `/tasks/create/<project_id>/` | Créer une tâche |
-| `/tasks/<id>/edit/` | Modifier une tâche |
-| `/tasks/<id>/delete/` | Supprimer une tâche |
 | `/tasks/statistics/` | Statistiques et primes |
 | `/admin/` | Administration |
+
+### Pages Angular (Objectif 2)
+
+| URL | Description |
+|---|---|
+| `/login` | Connexion |
+| `/register` | Inscription |
+| `/dashboard` | Tableau de bord |
+| `/projects` | Liste des projets |
+| `/projects/:id/tasks` | Tâches d'un projet |
 
 ### API REST
 
@@ -184,45 +199,38 @@ Headers: Authorization: Bearer <access_token>
 
 ---
 
+## 🧪 Tests
+```bash
+pip install pytest-django
+python -m pytest tests.py -v
+```
+
+Résultat : **9/9 tests passés ✅**
+
+---
+
 ## 📁 Structure du projet
 ```
 esmt-tasks/
-├── backend/
-│   ├── settings.py
-│   └── urls.py
-├── users/
-│   ├── models.py
-│   ├── views.py
-│   ├── forms.py
-│   ├── serializers.py
-│   ├── urls.py
-│   ├── api_views.py
-│   └── api_urls.py
-├── projects/
-│   ├── models.py
-│   ├── views.py
-│   ├── forms.py
-│   ├── serializers.py
-│   ├── urls.py
-│   ├── api_views.py
-│   └── api_urls.py
-├── tasks/
-│   ├── models.py
-│   ├── views.py
-│   ├── forms.py
-│   ├── serializers.py
-│   ├── urls.py
-│   ├── api_views.py
-│   └── api_urls.py
-├── templates/
-│   ├── base.html
-│   ├── dashboard.html
-│   ├── partials/
-│   ├── users/
-│   ├── projects/
-│   └── tasks/
+├── backend/           ← Config Django
+├── users/             ← App utilisateurs
+├── projects/          ← App projets
+├── tasks/             ← App tâches
+├── templates/         ← Templates Django (Objectif 1)
 ├── static/
 ├── media/
+├── frontend/          ← Application Angular (Objectif 2)
+│   └── src/
+│       └── app/
+│           ├── components/
+│           │   ├── login/
+│           │   ├── register/
+│           │   ├── dashboard/
+│           │   ├── projects/
+│           │   └── tasks/
+│           ├── services/
+│           └── interceptors/
+├── tests.py           ← Tests unitaires
 ├── manage.py
 └── README.md
 ```
